@@ -49,8 +49,8 @@ router.post('/', upload.single('file'), (req, res) => {
             return res.status(400).json({ success: false, message: 'No file uploaded' });
         }
         
-        // Return the relative URL (assuming the server serves /uploads)
-        const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+        // Return the relative URL (frontend will handle prefixing)
+        const fileUrl = `/uploads/${req.file.filename}`;
         
         res.json({ 
             success: true, 
