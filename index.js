@@ -10,6 +10,7 @@ import portfolioRoutes from './routes/portfolioRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js'; // Added
 
 // Fix __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -24,6 +25,9 @@ const port = process.env.PORT || 3001;
 // ── MIDDLEWARE ────────────────────────────────────────────
 app.use(cors());
 app.use(express.json()); // replaces body-parser
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ── DATABASE CONNECTION ───────────────────────────────────
 connectDB();
@@ -46,6 +50,7 @@ app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/upload', uploadRoutes); // Added
 
 // ── ERROR HANDLING ────────────────────────────────────────
 process.on('unhandledRejection', (reason, promise) => {
