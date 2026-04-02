@@ -6,5 +6,8 @@ const VisitorSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now }
 });
 
+// TTL Trigger: Delete records after 90 days (7,776,000 seconds)
+VisitorSchema.index({ timestamp: 1 }, { expireAfterSeconds: 7776000 });
+
 const Visitor = mongoose.model('Visitor', VisitorSchema);
 export default Visitor;
