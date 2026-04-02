@@ -1,0 +1,73 @@
+Model,Class,Correct,Total,Accuracy (%)
+customcnn,Black Rohu,82,89,92.13
+customcnn,Catla,78,90,86.67
+customcnn,Common Carp,70,90,77.78
+customcnn,Freshwater Shark,84,88,95.45
+customcnn,Grass Carp,82,90,91.11
+customcnn,Long-whiskered Catfish,85,88,96.59
+customcnn,Mirror Carp,71,90,78.89
+customcnn,Mrigal,79,90,87.78
+customcnn,Nile Tilapia,81,89,91.01
+customcnn,Rohu,77,90,85.56
+customcnn,Silver Carp,73,90,81.11
+customcnn,Striped Catfish,78,90,86.67
+ResNet50,Black Rohu,87,89,97.75
+ResNet50,Catla,90,90,100.0
+ResNet50,Common Carp,90,90,100.0
+ResNet50,Freshwater Shark,87,88,98.86
+ResNet50,Grass Carp,81,90,90.0
+ResNet50,Long-whiskered Catfish,85,88,96.59
+ResNet50,Mirror Carp,86,90,95.56
+ResNet50,Mrigal,83,90,92.22
+ResNet50,Nile Tilapia,88,89,98.88
+ResNet50,Rohu,70,90,77.78
+ResNet50,Silver Carp,77,90,85.56
+ResNet50,Striped Catfish,69,90,76.67
+EfficientNet_B0,Black Rohu,89,89,100.0
+EfficientNet_B0,Catla,88,90,97.78
+EfficientNet_B0,Common Carp,90,90,100.0
+EfficientNet_B0,Freshwater Shark,87,88,98.86
+EfficientNet_B0,Grass Carp,81,90,90.0
+EfficientNet_B0,Long-whiskered Catfish,88,88,100.0
+EfficientNet_B0,Mirror Carp,88,90,97.78
+EfficientNet_B0,Mrigal,82,90,91.11
+EfficientNet_B0,Nile Tilapia,89,89,100.0
+EfficientNet_B0,Rohu,85,90,94.44
+EfficientNet_B0,Silver Carp,84,90,93.33
+EfficientNet_B0,Striped Catfish,56,90,62.22
+MobileNetV2,Black Rohu,85,89,95.51
+MobileNetV2,Catla,90,90,100.0
+MobileNetV2,Common Carp,90,90,100.0
+MobileNetV2,Freshwater Shark,84,88,95.45
+MobileNetV2,Grass Carp,89,90,98.89
+MobileNetV2,Long-whiskered Catfish,87,88,98.86
+MobileNetV2,Mirror Carp,86,90,95.56
+MobileNetV2,Mrigal,77,90,85.56
+MobileNetV2,Nile Tilapia,88,89,98.88
+MobileNetV2,Rohu,89,90,98.89
+MobileNetV2,Silver Carp,86,90,95.56
+MobileNetV2,Striped Catfish,77,90,85.56
+DenseNet121,Black Rohu,88,89,98.88
+DenseNet121,Catla,90,90,100.0
+DenseNet121,Common Carp,90,90,100.0
+DenseNet121,Freshwater Shark,88,88,100.0
+DenseNet121,Grass Carp,89,90,98.89
+DenseNet121,Long-whiskered Catfish,88,88,100.0
+DenseNet121,Mirror Carp,89,90,98.89
+DenseNet121,Mrigal,83,90,92.22
+DenseNet121,Nile Tilapia,88,89,98.88
+DenseNet121,Rohu,89,90,98.89
+DenseNet121,Silver Carp,87,90,96.67
+DenseNet121,Striped Catfish,75,90,83.33
+ensemblemodel,Black Rohu,89,89,100.0
+ensemblemodel,Catla,90,90,100.0
+ensemblemodel,Common Carp,90,90,100.0
+ensemblemodel,Freshwater Shark,88,88,100.0
+ensemblemodel,Grass Carp,88,90,97.78
+ensemblemodel,Long-whiskered Catfish,88,88,100.0
+ensemblemodel,Mirror Carp,88,90,97.78
+ensemblemodel,Mrigal,87,90,96.67
+ensemblemodel,Nile Tilapia,89,89,100.0
+ensemblemodel,Rohu,88,90,97.78
+ensemblemodel,Silver Carp,89,90,98.89
+ensemblemodel,Striped Catfish,86,90,95.56
