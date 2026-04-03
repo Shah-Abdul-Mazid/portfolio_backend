@@ -56,7 +56,8 @@ router.post('/', upload.single('file'), async (req, res) => {
         readableStream.pipe(uploadStream);
 
         uploadStream.on('finish', () => {
-            const fileUrl = `/api/upload/${uploadStream.id}`;
+            const ext = path.extname(req.file.originalname);
+            const fileUrl = `/api/upload/${uploadStream.id}${ext}`;
             res.json({
                 success: true,
                 message: 'File uploaded successfully',
@@ -84,7 +85,8 @@ router.get('/:id', async (req, res) => {
         let fileId;
         
         try {
-            fileId = new mongoose.Types.ObjectId(req.params.id);
+            const rawId = req.params.id.split('.')[0];
+            fileId = new mongoose.Types.ObjectId(rawId);
         } catch (e) {
             return res.status(400).json({ success: false, message: 'Invalid file ID' });
         }
@@ -126,7 +128,8 @@ router.delete('/:id', async (req, res) => {
         let fileId;
         
         try {
-            fileId = new mongoose.Types.ObjectId(req.params.id);
+            const rawId = req.params.id.split('.')[0];
+            fileId = new mongoose.Types.ObjectId(rawId);
         } catch (e) {
             return res.status(400).json({ success: false, message: 'Invalid file ID' });
         }
