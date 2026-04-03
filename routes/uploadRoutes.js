@@ -1,8 +1,8 @@
 import express from 'express';
 import multer from 'multer';
 import mongoose from 'mongoose';
-import { GridFSBucket, ObjectId } from 'mongodb';
 import path from 'path';
+import { Readable } from 'stream';
 
 const router = express.Router();
 
@@ -22,11 +22,11 @@ const upload = multer({
     }
 });
 
-// Helper to get GridFS bucket
+// Helper to get GridFS bucket — uses mongoose's bundled mongodb driver to avoid BSON version conflicts
 const getBucket = () => {
     const db = mongoose.connection.db;
     if (!db) throw new Error('Database not connected');
-    return new GridFSBucket(db, { bucketName: 'uploads' });
+    return new mongoose.mongo.GridFSBucket(db, { bucketName: 'uploads' });
 };
 
 // POST /api/upload — upload file to MongoDB GridFS
@@ -39,7 +39,12 @@ router.post('/', upload.single('file'), async (req, res) => {
         const bucket = getBucket();
         const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(req.file.originalname)}`;
 
-        // Upload buffer to GridFS
+        // Create a readable stream from the buffer
+        const readableStream = new Readable();
+        readableStream.push(req.file.buffer);
+        readableStream.push(null);
+
+        // Upload to GridFS
         const uploadStream = bucket.openUploadStream(uniqueName, {
             contentType: req.file.mimetype,
             metadata: {
@@ -48,7 +53,7 @@ router.post('/', upload.single('file'), async (req, res) => {
             }
         });
 
-        uploadStream.end(req.file.buffer);
+        readableStream.pipe(uploadStream);
 
         uploadStream.on('finish', () => {
             const fileUrl = `/api/upload/${uploadStream.id}`;
@@ -79,7 +84,7 @@ router.get('/:id', async (req, res) => {
         let fileId;
         
         try {
-            fileId = new ObjectId(req.params.id);
+            fileId = new mongoose.Types.ObjectId(req.params.id);
         } catch (e) {
             return res.status(400).json({ success: false, message: 'Invalid file ID' });
         }
@@ -121,7 +126,7 @@ router.delete('/:id', async (req, res) => {
         let fileId;
         
         try {
-            fileId = new ObjectId(req.params.id);
+            fileId = new mongoose.Types.ObjectId(req.params.id);
         } catch (e) {
             return res.status(400).json({ success: false, message: 'Invalid file ID' });
         }
