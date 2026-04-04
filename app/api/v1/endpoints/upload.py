@@ -4,25 +4,98 @@ from app.api.v1.endpoints.portfolio import get_admin_user
 import cloudinary
 import cloudinary.uploader
 import logging
+import os
 from bson import ObjectId
+from bson.errors import InvalidId
 
 router = APIRouter()
 logger = logging.getLogger("portfolio-upload")
 
+# Make sure this runs once at startup, or keep it here if needed
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True
+)
+
+
 @router.post("/upload")
 async def upload_file(
     file: UploadFile = File(...),
-    user_id: str = Query(..., description="User ID to update"),
-    type: str = Query(..., description="Type of upload: 'experience' or 'work'"),
-    index: int = Query(..., description="Index of experience/work item to update"),
+    user_id: str = Query(..., description="Mongo user id"),
+    upload_type: str = Query(..., description="experience or work"),
+    index: int = Query(..., description="Array index to update"),
+    doc_kind: str = Query(..., description="certificate / appointment / experience"),
     db=Depends(get_database),
     current_user=Depends(get_admin_user)
 ):
     """
-    Upload a file to Cloudinary and update user's experience/work array with the file URL.
+    Upload file to Cloudinary and update the correct portfolio field.
+
+    experience:
+      - certificateUrl
+
+    work:
+      - appointmentLetterUrl
+      - experienceLetterUrl
     """
 
     try:
+        # Validate upload_type
+        if upload_type not in ["experience", "work"]:
+            raise HTTPException(
+                status_code=400,
+                detail="upload_type must be 'experience' or 'work'"
+            )
+
+        # Validate user_id
+        try:
+            object_user_id = ObjectId(user_id)
+        except InvalidId:
+            raise HTTPException(status_code=400, detail="Invalid user_id")
+
+        # Validate index
+        if index < 0:
+            raise HTTPException(status_code=400, detail="index must be >= 0")
+
+        # Decide which DB field to update
+        if upload_type == "experience":
+            if doc_kind != "certificate":
+                raise HTTPException(
+                    status_code=400,
+                    detail="For upload_type='experience', doc_kind must be 'certificate'"
+                )
+            field_path = f"experience.{index}.certificateUrl"
+
+        else:  # work
+            if doc_kind == "appointment":
+                field_path = f"work.{index}.appointmentLetterUrl"
+            elif doc_kind == "experience":
+                field_path = f"work.{index}.experienceLetterUrl"
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail="For upload_type='work', doc_kind must be 'appointment' or 'experience'"
+                )
+
+        # Optional content type validation
+        allowed_types = {
+            "application/pdf",
+            "image/jpeg",
+            "image/jpg",
+            "image/png",
+            "image/webp",
+            "image/gif",
+            "image/avif",
+        }
+
+        if file.content_type not in allowed_types:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported file type: {file.content_type}"
+            )
+
         # Upload to Cloudinary
         result = cloudinary.uploader.upload(
             file.file,
@@ -35,34 +108,40 @@ async def upload_file(
         resource_type = result.get("resource_type")
         file_format = result.get("format")
 
-        logger.info(f"Uploaded file: {public_id} ({resource_type}.{file_format})")
+        if not secure_url:
+            raise HTTPException(status_code=500, detail="Cloudinary did not return secure_url")
 
-        # Determine field to update
-        if type not in ["experience", "work"]:
-            raise HTTPException(status_code=400, detail="type must be 'experience' or 'work'")
+        logger.info(f"Uploaded file successfully: {public_id}")
 
-        # Build update query
-        field_path = f"{type}.{index}.certificateUrl" if type == "experience" else f"{type}.{index}.workUrl"
+        # Check user exists first
+        existing_user = await db["users"].find_one({"_id": object_user_id}, {"_id": 1})
+        if not existing_user:
+            raise HTTPException(status_code=404, detail="User not found")
 
+        # Update DB
         update_result = await db["users"].update_one(
-            {"_id": ObjectId(user_id)},
+            {"_id": object_user_id},
             {"$set": {field_path: secure_url}}
         )
 
-        if update_result.modified_count == 0:
-            raise HTTPException(status_code=404, detail="User or index not found")
+        # matched_count 0 means no user matched
+        if update_result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
 
         return {
             "success": True,
+            "message": "File uploaded successfully",
             "file": {
                 "url": secure_url,
                 "public_id": public_id,
                 "resource_type": resource_type,
                 "format": file_format,
-                "updated_field": field_path
+                "updated_field": field_path,
             }
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
-        logger.error(f"Upload error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Cloudinary upload failed: {str(e)}")
+        logger.exception("Upload error")
+        raise HTTPException(status_code=500, detail=str(e))
