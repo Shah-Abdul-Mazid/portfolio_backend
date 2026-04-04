@@ -1,6 +1,7 @@
-# 🚀 Portfolio & AI Agent FastAPI Requirements (Vercel Optimized)
+# 🚀 Portfolio & AI Agent FastAPI Requirements (Production Optimized)
 fastapi
 uvicorn[standard]
+gunicorn
 motor
 cloudinary
 python-dotenv
