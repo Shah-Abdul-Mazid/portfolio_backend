@@ -1,0 +1,12 @@
+# 🚀 Portfolio & AI Agent FastAPI Requirements
+fastapi
+uvicorn[standard]
+motor
+cloudinary
+python-dotenv
+pydantic-settings
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+httpx
+pydantic
