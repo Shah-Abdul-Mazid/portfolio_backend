@@ -26,12 +26,17 @@ async def shutdown_db_client():
     await close_mongo_connection()
 
 # --- 3. CLOUDINARY CONFIG ---
-cloudinary.config(
-    cloud_name=settings.CLOUDINARY_CLOUD_NAME,
-    api_key=settings.CLOUDINARY_API_KEY,
-    api_secret=settings.CLOUDINARY_API_SECRET,
-    secure=True
-)
+if settings.CLOUDINARY_URL:
+    # Use the combined URL automatically
+    cloudinary.config(cloudinary_url=settings.CLOUDINARY_URL, secure=True)
+elif settings.is_cloudinary_configured:
+    # Use individual keys
+    cloudinary.config(
+        cloud_name=settings.CLOUDINARY_CLOUD_NAME,
+        api_key=settings.CLOUDINARY_API_KEY,
+        api_secret=settings.CLOUDINARY_API_SECRET,
+        secure=True
+    )
 
 # --- 4. API ROUTING (Professional Modular Structure) ---
 # Each piece of your portfolio is now in its own dedicated file
