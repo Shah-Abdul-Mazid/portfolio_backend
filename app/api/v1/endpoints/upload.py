@@ -12,12 +12,15 @@ async def upload_file(file: UploadFile = File(...)):
         result = cloudinary.uploader.upload(
             file.file,
             folder="portfolio_uploads",
-            resource_type="auto"
+            resource_type="auto",
+            use_filename=True,
+            unique_filename=True
         )
 
         return {
             "success": True,
             "url": result.get("secure_url"),   # ✅ Added for Frontend compatibility
+            "filename": result.get("original_filename"), # Added
             "file": {
                 "url": result.get("secure_url"),
                 "public_id": result.get("public_id"),
