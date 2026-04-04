@@ -13,11 +13,10 @@ async def upload_file(file: UploadFile = File(...)):
         ext = file.filename.split('.')[-1].lower() if '.' in file.filename else ""
         res_type = "auto"
         
-        # If it's a PDF, force resource_type to 'raw' to avoid image-bucket 401/404 errors in some Cloudinary accounts
-        if ext == "pdf":
-            res_type = "raw"
-            logger.info(f"Forcing 'raw' resource_type for PDF upload: {file.filename}")
-
+        # Use 'auto' to allow Cloudinary to detect the format (PDF/Image/etc.)
+        # This prevents the 'Format: N/A' issue in the dashboard.
+        res_type = "auto"
+        
         result = cloudinary.uploader.upload(
             file.file,
             folder="portfolio_uploads",
