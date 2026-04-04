@@ -1,4 +1,4 @@
-# 🚀 Portfolio & AI Agent FastAPI Requirements
+# 🚀 Portfolio & AI Agent FastAPI Requirements (Vercel Optimized)
 fastapi
 uvicorn[standard]
 motor
@@ -7,6 +7,6 @@ python-dotenv
 pydantic-settings
 python-multipart
 python-jose[cryptography]
-passlib[bcrypt]
+bcrypt
 httpx
 pydantic
