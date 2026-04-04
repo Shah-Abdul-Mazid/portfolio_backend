@@ -24,7 +24,11 @@ class Settings(BaseSettings):
     CLOUDINARY_URL: Optional[str] = None 
 
     # Load from .env in project root
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env", 
+        extra="ignore", 
+        env_ignore_case=True # CRITICAL for Render/Vercel environment variable case matching
+    )
 
     @property
     def get_atlas_url(self) -> str:

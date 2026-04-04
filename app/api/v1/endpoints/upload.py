@@ -27,5 +27,9 @@ async def upload_file(file: UploadFile = File(...)):
             "public_id": result.get("public_id")
         }
     except Exception as e:
-        logger.error(f"Upload error: {e}")
-        raise HTTPException(status_code=500, detail="Upload failed")
+        logger.error(f"Upload error: {str(e)}")
+        # Returning 400 with the exact error so the frontend alert(result.message) displays it
+        return {
+            "success": False,
+            "message": f"Cloudinary upload failed: {str(e)}"
+        }
