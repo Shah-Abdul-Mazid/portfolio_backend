@@ -54,7 +54,10 @@ async def track_page_view(request: Request, db=Depends(get_database)):
 async def get_analytics(db=Depends(get_database)):
     """Retrieve total page views."""
     stats = await db["analytics"].find_one({"id": "total_views"})
-    return stats if stats else {"count": 0}
+    if stats:
+        stats["_id"] = str(stats["_id"])
+        return stats
+    return {"count": 0}
 
 @router.get("/visitors")
 async def get_visitors_list(admin=Depends(get_admin_user), db=Depends(get_database)):
